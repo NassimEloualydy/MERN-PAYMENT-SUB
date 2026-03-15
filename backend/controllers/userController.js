@@ -61,8 +61,41 @@ exports.signIng=async (req,res)=>{
     const form=new formidable.IncomingForm()
     form.keepExtensions=true
     form.parse(req,async (err,fields,files)=>{
-        const {first_name,last_name,email,phone,password}=fields
-    
+        const {first_name,last_name,email,phone,password,_id}=fields
+        if(_id){
+        if(!first_name || !last_name || !email || !phone)
+            return res.status(400).json({err:"All the fields required !!"})
+        var u=await User.find().select("-photo").and([{last_name},{_id:{$ne:_id}}])
+        if(u.length!=0)
+            return res.status(400).json({err:"The first name and the last name are exist already"})
+        u=await User.find().select("-photo").and([{email},{_id:{$ne:_id}}])
+        if(u.length!=0)
+            return res.status(400).json({err:"Please the email is already exist !!"})
+         u=await User.find().select("-photo").and([{phone},{_id:{$ne:_id}}])
+        if(u.length!=0)
+            return res.status(400).json({err:"Please the phone is already exist !!"})
+        
+        const data_updated={first_name,last_name,email,phone}
+        if(password){
+            const salte=await bcrypt.genSalt(10)
+            const hashed_pw=await bcrypt.hash(password,salte)  
+            data_updated.password=   hashed_pw     
+        }
+        if(files.photo){
+           data_updated.photo= {
+                data:fs.readFileSync(files.photo.path),
+                contentType:files.photo.type
+            }
+        }
+        const user=await User.findOneAndUpdate(
+            {_id},
+            {$set:data_updated},
+            {$new:true}
+        )
+        if(user)
+            return res.json({message:"User Updated with success success !!"})
+        return res.status(400).json({err:user})
+        }else{
         if(!first_name || !last_name || !email || !phone || !password)
             return res.status(400).json({err:"All the fields required !!"})
         var u=await User.find({first_name,last_name}).select("-photo")
@@ -80,7 +113,7 @@ exports.signIng=async (req,res)=>{
         const salte=await bcrypt.genSalt(10)
         const hashed_pw=await bcrypt.hash(password,salte)  
         const user=await User.create({
-            first_name,last_name,email,phone,role:"Admin",password:hashed_pw,photo:{
+            first_name,last_name,email,phone,role:"User",password:hashed_pw,photo:{
                 data:fs.readFileSync(files.photo.path),
                 contentType:files.photo.type
             }
@@ -88,6 +121,8 @@ exports.signIng=async (req,res)=>{
         if(user)
             return res.json({message:"Sign In with success !!"})
         return res.status(400).json({err:user})
+        }
+
     
     })
         
@@ -130,5 +165,17 @@ exports.getPhoto=async (req,res)=>{
         res.set('Content-Type',user[0].photo.contentType)
         return res.send(user[0].photo.data)
     }
+
+}
+exports.deleteUser=async (req,res)=>{
+    const _id=req.params._id
+    if(_id==req.user._id){
+        return res.status(400).json({err:"Please you can't delete your account !!"})
+    }
+    const user=await User.findOneAndDelete({_id})
+    if(user)
+        return res.json({message:"User Deleted with success !!"})
+    return res.status(400).json({err:user})
+
 
 }
