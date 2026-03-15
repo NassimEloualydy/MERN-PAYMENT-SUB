@@ -17,7 +17,7 @@ const Menu = () => {
     }
     const [user,setUser]=useState({})
     useEffect(()=>{
-      const user=JSON.parse(localStorage.getItem("user"));
+      const user=JSON.parse(localStorage.getItem("user_info"));
       if(user)
         setUser(user)
       
@@ -44,9 +44,11 @@ const Menu = () => {
      )}
 {user.first_name && (
       <>
-     <div onClick={NavigateUrl.bind(this,"/products")} className="itemMenu">Products</div>     
-     <div onClick={NavigateUrl.bind(this,"/your_account")} className="itemMenu">Your Account</div>     
-     <div onClick={NavigateUrl.bind(this,"/Log Out")} className="itemMenu">Log Out</div>
+     <div onClick={NavigateUrl.bind(this,"/")} className="itemMenu">Home</div>     
+     <div onClick={NavigateUrl.bind(this,"/users")} className="itemMenu">Users</div>     
+     <div onClick={NavigateUrl.bind(this,"/Log Out")} className="itemMenu">Log Out</div>     
+     {/* <div onClick={NavigateUrl.bind(this,"/your_account")} className="itemMenu">Your Account</div>     
+     <div onClick={NavigateUrl.bind(this,"/Log Out")} className="itemMenu">Log Out</div> */}
       </>
      )}
 

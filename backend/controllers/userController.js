@@ -105,4 +105,30 @@ exports.login=async (req,res)=>{
     const is_matched=await bcrypt.compare(pw,hashed_pw)
     if(!is_matched)
         return res.status(400).json({error:"The password is wrong !!"})
+    const JWT_SECRETE=process.env.JWT_SECRETE
+    const token=await jwt.sign({user:data[0]},JWT_SECRETE,{expiresIn:"30d"})
+    return res.json({user:{first_name:data[0].first_name,last_name:data[0].last_name,token}})
+}
+exports.getData=async (req,res)=>{
+ const {first_name,last_name,email,phone,role}=req.body
+ const searchQuery={}
+ searchQuery.first_name={$regex:'.*'+first_name+'.*',$options:'i'}
+ searchQuery.last_name={$regex:'.*'+last_name+'.*',$options:'i'}
+ searchQuery.email={$regex:'.*'+email+'.*',$options:'i'}
+ searchQuery.phone={$regex:'.*'+phone+'.*',$options:'i'}
+ searchQuery.role={$regex:'.*'+role+'.*',$options:'i'}
+
+ const data=await User.find(searchQuery).select("-photo")
+ if(data)
+    return res.json({data})
+return res.status(400).json({err:data})
+}
+exports.getPhoto=async (req,res)=>{
+    const _id=req.params._id
+    const user=await User.find({_id}).select()
+    if(user.length==1){
+        res.set('Content-Type',user[0].photo.contentType)
+        return res.send(user[0].photo.data)
+    }
+
 }

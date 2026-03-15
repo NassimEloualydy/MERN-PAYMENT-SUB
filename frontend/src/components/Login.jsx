@@ -27,6 +27,10 @@ const Login = () => {
                     if(res.user){
                         localStorage.setItem("user_info",JSON.stringify(res.user))
                         toastr.success("Login with success !!","Success",{positionClass:"toast-bottom-right"})
+                        setUser({
+                          email:"",
+                          password:""
+                        })
                     }
                             else if(res.error){
                         toastr.error(res.error,"Error",{positionClass:"toast-bottom-right"})
