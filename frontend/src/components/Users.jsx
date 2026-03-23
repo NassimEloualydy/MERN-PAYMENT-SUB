@@ -1,12 +1,16 @@
 import React,{useState,useEffect} from 'react'
+import { useNavigate } from 'react-router-dom';
 import toastr from 'toastr';
 import Menu from './Menu'
 import { BASE_URL } from '../config/config';
 import Breadcrump from './Breadcrump';
 const Users = () => {
+      const Navigate=useNavigate()
       const [users,setUsers]=useState([])
       const [menu,setMenu]=useState(false);
+      const [userConnected,setUserConnected]=useState({})
       const [user,setUser]=useState({
+        _id:"",
         first_name:"",
         last_name:"",
         
@@ -15,10 +19,32 @@ const Users = () => {
         role:""
       })
   const pathPages=[{name:"Home",urlPath:"/"}]
+const loadNewForm=()=>{
+  Navigate("/signIn",{ state: { message: "User Form" } })
+}
 const deleteData=(data)=>{
-
+  const {token}=JSON.parse(localStorage.getItem("user_info"))
+  fetch(`${BASE_URL}/user/delete/${data}`,{
+    method:"POST",
+    headers:{
+      "Accept":"application/json",
+      "Content-Type":"application/json",
+      "Authorization":`Bearer ${token}`
+    }
+  }).then(res=>res.json()).then(res=>{
+    if(res.message){
+      toastr.success(res.message,"Success",{positionClass:"toast-bottom-right"})
+      getData()
+    }else if(res.err){
+      toastr.error(res.err,"Error",{positionClass:"toast-bottom-right"})
+      
+    }else{
+      console.log(res)
+    }
+  }).catch(err=>console.log(err))
 }
 const loadData=(data)=>{
+  Navigate("/signIn",{ state: { message: "Update User",user:data} })
 
 }
       const getData=()=>{
@@ -73,6 +99,10 @@ const loadData=(data)=>{
                 })
           }
     useEffect(()=>{
+         const {user}=JSON.parse(localStorage.getItem("user_info")) 
+         setUserConnected(user)
+         
+
         getData()
     },[])
   return (
@@ -123,11 +153,19 @@ const loadData=(data)=>{
 
     </div>
 <Breadcrump currentPage="Users" pathPages={pathPages} />
+{JSON.stringify(userConnected)}
+    <div className="container">
+      <div className="row">
+        <div className="col-md">
+        <input type="button" value="New" onClick={loadNewForm} className="btn btn-dark" />
+        </div>
+      </div>
+    </div>
     <section className="m-3">
       <div className="container">
         <div className="row">
             {users.map((u,key)=>(
-            <div key={key} className="col-md-4 col-lg-3">
+            <div key={key} className="col-md-6 col-lg-3">
                     <div className="card" style={{position:"relative"}}>
                   <span style={{position: "absolute", bottom: "2px",right: "5px",paddingBottom:"0px"}} onClick={deleteData.bind(this,u._id)} className="Icon Icon_delete">
                             <ion-icon   name="trash-outline"></ion-icon>
@@ -194,6 +232,7 @@ const loadData=(data)=>{
                 </div>
 
               
+                <br/>
                 </div>
             ))}
         </div>

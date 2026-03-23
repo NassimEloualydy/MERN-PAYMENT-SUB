@@ -1,13 +1,16 @@
 import React,{useState,useEffect} from 'react'
 import toastr from 'toastr';
 import Menu from './Menu'
+import { useLocation } from 'react-router-dom';
 import { BASE_URL } from '../config/config';
+import Breadcrump from './Breadcrump';
+
 import {PayPalButtons,PayPalScriptProvider,usePayPalScriptReducer} from '@paypal/react-paypal-js'
 const SignIn = () => {
 const base="https://api-m.sandbox.paypal.com"
 const CLIENT_ID="AZgVyHJWiHKBxCakivCo6f_RAYN_NLYF7Xdy56asejPJNSbwu8Kbi4xeZjhXIil8P3EfvAtuK2rih416"
 const SECRETE_KEY="EE2tqL0icul0olXYWpjFWBR0gM1JuuuiT1MebjqFM3IT67IMaMps2WAMaRWfrQW0bQir_g7P93_brHUR"
-
+const pathPages=[{name:"Home",urlPath:"/"},{name:"Users",urlPath:"/users"}]
   const [formData,setFormData]=useState(new FormData());
   const [user,setUser]=useState({
     first_name:"",
@@ -16,6 +19,9 @@ const SECRETE_KEY="EE2tqL0icul0olXYWpjFWBR0gM1JuuuiT1MebjqFM3IT67IMaMps2WAMaRWfr
     password:"",
     phone:""
   })
+  const location=useLocation()
+  const message=location.state?.message
+  const userUpdated=location.state?.user
   
   const handlechange=(e)=>{
     const value=e.target.name=='photo'?e.target.files[0]:e.target.value
@@ -35,6 +41,18 @@ const SECRETE_KEY="EE2tqL0icul0olXYWpjFWBR0gM1JuuuiT1MebjqFM3IT67IMaMps2WAMaRWfr
     const ApproveCreateOrder=()=>{
 
     }
+  useEffect(()=>{
+    if(userUpdated){
+
+      setUser({...userUpdated,password:''})
+      formData.set("first_name",userUpdated.first_name)
+      formData.set("last_name",userUpdated.last_name)
+      formData.set("email",userUpdated.email)
+      formData.set("phone",userUpdated.phone)
+      formData.set("_id",userUpdated._id)
+    }
+
+  },[])
   const submitData=()=>{
     fetch(`${BASE_URL}/user/signIng`,{
       method:"POST",
@@ -59,6 +77,7 @@ const SECRETE_KEY="EE2tqL0icul0olXYWpjFWBR0gM1JuuuiT1MebjqFM3IT67IMaMps2WAMaRWfr
         console.log(res)
       }
     }).catch(err=>console.log(err))
+
   }
 
   return (
@@ -82,12 +101,31 @@ const SECRETE_KEY="EE2tqL0icul0olXYWpjFWBR0gM1JuuuiT1MebjqFM3IT67IMaMps2WAMaRWfr
         <br />
         <div className="container border border-white text-light pb-3 rounded-3">
             <div className="p-2">
-                <h3 className='fw-bolder'>Sign In</h3>
+              
+                            {(message=='Update User') && (
 
+                <h3 className='fw-bolder'>{userUpdated.first_name} {userUpdated.last_name}</h3>
+              )}
+
+              {(message=='User Form') && (
+
+                <h3 className='fw-bolder'>New User</h3>
+              )}
+ {(!message) && (
+
+                <h3 className='fw-bolder'>Sign In</h3>
+              )}
             </div>
         </div>
 
     </div>
+                {(message=='User Form') && (
+                    <Breadcrump currentPage="New User" pathPages={pathPages} />
+              )}
+                              {(message=='Update User') && (
+                    <Breadcrump currentPage={userUpdated.first_name+' '+userUpdated.last_name} pathPages={pathPages} />
+              )}
+
     <section className="m-3">
       <div className="container">
         <div className="row">

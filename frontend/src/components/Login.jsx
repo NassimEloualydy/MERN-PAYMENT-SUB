@@ -2,7 +2,13 @@ import React,{useState,useEffect} from 'react'
 import toastr from 'toastr';
 import Menu from './Menu'
 import { BASE_URL } from '../config/config';
+import { useLocation,useNavigate } from 'react-router-dom';
+
 const Login = () => {
+      const location=useLocation()
+      const Navigate=useNavigate()
+
+      const message=location.state?.message
       const [menu,setMenu]=useState(false);
       const [user,setUser]=useState({
         email:"",
@@ -31,6 +37,7 @@ const Login = () => {
                           email:"",
                           password:""
                         })
+                        Navigate('/')
                     }
                             else if(res.error){
                         toastr.error(res.error,"Error",{positionClass:"toast-bottom-right"})
@@ -64,7 +71,12 @@ const Login = () => {
         <br />
         <div className="container border border-white text-light pb-3 rounded-3">
             <div className="p-2">
+              {(message=="User Form") && (
+                <h3 className='fw-bolder'>New User</h3>
+              )}
+              {(message!="User Form") && (
                 <h3 className='fw-bolder'>Login Page</h3>
+              )}
 
             </div>
         </div>
