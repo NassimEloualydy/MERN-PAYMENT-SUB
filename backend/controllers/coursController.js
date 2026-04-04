@@ -7,24 +7,48 @@ exports.submitData=async (req,res)=>{
     const form=new formidable.IncomingForm()
     form.keepExtensions=true
     form.parse(req,async (err,fields,files)=>{
-        const {tags,name,price,rating,prof,description,state}=fields
-        if(!tags || !name || !price || !rating || !prof || !state || !description){
+        
+        const {tags,name,price,rating,prof,description,state,_id}=fields
+        if(_id){
+                    if(!tags || !name || !price || !rating || !prof || !state || !description){
             return res.status(400).json({err:"Please all the fields required"})
         }
-        if(!files.photo){
-            return res.status(400).json({err:"Please the photo is required !!"})
-        }
-        var data=await Cours.find({name}).select("-photo")
+        var data=await Cours.find().select("-photo").and([{name},{_id:{$ne:_id}}])
         if(data.length!=0)
             return res.status(400).json({err:"Please the name is already exist !!"})
-        data=await Cours.create({
-            tags,name,price,rating,prof,description,state,photo:{
+        const data_updated={tags,name,price,rating,prof,description,state}
+        if(files.photo){
+            data_updated.photo={
                 data:fs.readFileSync(files.photo.path),
                 contentType:files.photo.type
             }
-        })
-        if(data){
-            return res.json({message:"Cours created with success !!"})
+        }
+        data=await Cours.findOneAndUpdate(
+            {_id},{$set:data_updated},{$new:true}
+        )
+        if(data)
+            return res.json({message:"Updated with success "})
+        return res.status(400).json({err:data})
+        }else{
+
+            if(!tags || !name || !price || !rating || !prof || !state || !description){
+                return res.status(400).json({err:"Please all the fields required"})
+            }
+            if(!files.photo){
+                return res.status(400).json({err:"Please the photo is required !!"})
+            }
+            var data=await Cours.find({name}).select("-photo")
+            if(data.length!=0)
+                return res.status(400).json({err:"Please the name is already exist !!"})
+            data=await Cours.create({
+                tags,name,price,rating,prof,description,state,photo:{
+                    data:fs.readFileSync(files.photo.path),
+                    contentType:files.photo.type
+                }
+            })
+            if(data){
+                return res.json({message:"Cours created with success !!"})
+            }
         }
     })
 }
@@ -60,4 +84,11 @@ exports.getPhoto=async (req,res)=>{
         return res.send(c[0].photo.data)
     }
         
+}
+exports.deleteCours=async (req,res)=>{
+    const _id=req.params._id
+    const cours=await Cours.findOneAndDelete({_id})
+    if(cours)
+        return res.json({message:"Cours Deleted with success !!"})
+        return res.status(400).json({err:cours})
 }

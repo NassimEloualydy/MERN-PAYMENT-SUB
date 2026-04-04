@@ -22,10 +22,26 @@ prof_email:"",
 description:""
   })
 const   deleteData=(data)=>{
-    
+    const {token}=JSON.parse(localStorage.getItem("user_info"))
+    fetch(`${BASE_URL}/cours/deleteCours/${data}`,{
+        method:"POST",
+        headers:{
+            "Accept":"application/json",
+            "Content-Type":"application/json",
+            "Authorization":`Bearer ${token}`
+        },
+    }).then(res=>res.json()).then(res=>{
+        if(res.message){
+
+            toastr.success(res.message,"Success",{positionClass:"toast-bottom-right"})
+            getData()
+        }
+        else
+            console.log(res)
+    }).catch(err=>console.log(err))
 }
 const loadData=(data)=>{
-    
+        Navigate("/CoursForm",{state:{message:"Update Cors",corsUpdated:data}})
 }
     const handleChange=(e)=>{
         setCourses({...courses,[e.target.name]:e.target.value})

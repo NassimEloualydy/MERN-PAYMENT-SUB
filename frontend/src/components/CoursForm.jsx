@@ -39,10 +39,10 @@ const getDataProfs=()=>{
   const [formData,setFormData]=useState(new FormData());
 const [valueTags,setValueTags]=useState([])
   const [cours,setCours]=useState({
+    _id:"",
     name:"",
     price:"",
     rating:"",
-    state:"",
     tags:"",
     prof:"",
     description:"",
@@ -51,7 +51,7 @@ const [valueTags,setValueTags]=useState([])
     var [tag, setTag] = useState(tags);
   const location=useLocation()
   const message=location.state?.message
-  const corsUpdated=location.state?.user
+  const corsUpdated=location.state?.corsUpdated
   
   const handlechange=(e)=>{
     if(!Array.isArray(e)){
@@ -79,13 +79,17 @@ const [valueTags,setValueTags]=useState([])
       }
   useEffect(()=>{
     if(corsUpdated){
-
-      setUser({...corsUpdated,password:''})
-      formData.set("first_name",corsUpdated.first_name)
-      formData.set("last_name",corsUpdated.last_name)
-      formData.set("email",corsUpdated.email)
-      formData.set("phone",corsUpdated.phone)
+      
+      setCours({...corsUpdated,prof:corsUpdated.prof?._id})
+      setValueTags(corsUpdated.tags.split(','))
       formData.set("_id",corsUpdated._id)
+      formData.set("name",corsUpdated.name)
+      formData.set("price",corsUpdated.price)
+      formData.set("rating",corsUpdated.rating)
+      formData.set("tags",corsUpdated.tags)
+      formData.set("prof",corsUpdated.prof?._id)
+      formData.set("description",corsUpdated.description)
+      formData.set("state",corsUpdated.state)
     }
     getDataProfs()
 
@@ -159,7 +163,7 @@ Navigate("/cours")
                 {(message=='New Cours') && (
                     <Breadcrump currentPage="New Cours" pathPages={pathPages} />
               )}
-                              {(message=='Update User') && (
+                              {(message=='Update Cors') && (
                     <Breadcrump currentPage={corsUpdated.name} pathPages={pathPages} />
               )}
 
