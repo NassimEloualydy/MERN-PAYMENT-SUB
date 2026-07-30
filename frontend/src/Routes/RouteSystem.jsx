@@ -7,6 +7,8 @@ import Users from '../components/Users'
 import Home from '../components/Home'
 import Cours from '../components/Cours'
 import CoursForm from '../components/CoursForm'
+import MemeberShip from '../components/MemberShipe'
+import MemberShipForm from '../components/MemberShipForm'
 const RouteSystem = () => {
   return (
     <div>
@@ -20,6 +22,8 @@ const RouteSystem = () => {
                         <Route path='/' element={<Home/>}/>
                         <Route path="/cours" element={<Cours/>}/>
                         <Route path="/CoursForm" element={<CoursForm/>}/>
+                        <Route path="/MemeberShip" element={<MemeberShip/>} />
+                        <Route path="/MemberShipForm" element={<MemberShipForm/>}/>
     </Route>                </Routes>
             </>
         </Router>

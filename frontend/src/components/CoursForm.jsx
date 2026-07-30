@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import toastr from 'toastr';
 import Menu from './Menu'
 import { useLocation } from 'react-router-dom';
-import { CMultiSelect } from "@coreui/react-pro";
 import { BASE_URL } from '../config/config';
 import Breadcrump from './Breadcrump';
+import { CMultiSelect } from "@coreui/react-pro";
 import "@coreui/coreui-pro/dist/css/coreui.min.css";
 import {PayPalButtons,PayPalScriptProvider,usePayPalScriptReducer} from '@paypal/react-paypal-js'
 import { tags } from '../config/config';

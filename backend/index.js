@@ -8,8 +8,10 @@ app.use(cors())
 
 const userRoutes=require("./routes/userRoutes")
 const coursRoutes=require("./routes/coursRoutes")
+const memeberShipRoutes=require("./routes/memeberShipRoutes")
 app.use("/API/user",userRoutes)
 app.use("/API/cours",coursRoutes)
+app.use("/API/memebership",memeberShipRoutes)
 const PORT=process.env.PORT || 5000
 const DATABASE=process.env.DATABASE
 mongoose.connect(DATABASE).then(()=>{
