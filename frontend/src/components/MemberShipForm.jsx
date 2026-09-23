@@ -62,6 +62,7 @@ const MemberShipForm = () => {
                     },
                     body:JSON.stringify(memeberShip)
                 }).then(res=>res.json()).then(res=>{
+                  console.log(res)
                     if(res.message){
                         toastr.success(res.message,"Success",{positionClass:"toast-bottom-right"})
                         setMemeberShip({
